@@ -13,6 +13,10 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { RedisConnectionModule } from './database/connectionRedis.js';
 import { EmailModule } from './common/email/email.module.js';
 import {MiddleWare} from './common/middleware/logger.middleware.js'
+import { CategoryModule } from './modules/category/category.module.js';
+import { BrandModule } from './modules/brand/brand.module.js';
+import { ProductModule } from './modules/product/product.module.js';
+import { CartModule } from './modules/cart/cart.module.js';
 
 const envFilePath = path.resolve(
   process.cwd(),
@@ -33,6 +37,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   RedisConnectionModule,
     AuthModule,
     EmailModule,
+    CategoryModule,
+    BrandModule,
+    ProductModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

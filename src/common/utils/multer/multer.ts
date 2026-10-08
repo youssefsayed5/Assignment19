@@ -2,13 +2,14 @@ import multer, { diskStorage, type Options } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { BadRequestException } from '@nestjs/common';
+import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const uploadDir = join(process.cwd(), 'uploads');
+export const uploadDir = join(process.cwd(), 'uploads');
 if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
 
-export const imageUploadOptions = {
+export const imageUploadOptions: MulterOptions = {
   storage: diskStorage({
     destination: uploadDir,
     filename: (req, file, cb) => {
@@ -16,7 +17,7 @@ export const imageUploadOptions = {
       cb(null, `${unique}${extname(file.originalname)}`);
     },
   }),
-  limits: { fileSize: MAX_FILE_SIZE },
+  limits: { fileSize: MAX_FILE_SIZE, files: 10 },
   fileFilter: (req: any, file: Express.Multer.File, cb: any) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new BadRequestException('Only image files are allowed'), false);

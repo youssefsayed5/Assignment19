@@ -1,27 +1,32 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
 import { AppModule } from './app.module.js';
-import { env } from './config/env.service.js'; 
-import { compareWord, hashWord } from './common/security/HashWord.js';
-import { UseInterceptors, ValidationPipe } from '@nestjs/common';
-import {ResponseInterceptor} from './Interceptors/transform.interceptor.js'
+import { env } from './config/env.service.js';
+import { ResponseInterceptor } from './Interceptors/transform.interceptor.js';
 import { LoggingInterceptor } from './Interceptors/logger.interceptor.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-);  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-UseInterceptors(ResponseInterceptor);
-UseInterceptors(LoggingInterceptor);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new ResponseInterceptor(),
+  );
+
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   await app.listen(env.port);
-  console.log(`Server is running.......`);
+  console.log('Server is running.......');
 }
 
 await bootstrap();
